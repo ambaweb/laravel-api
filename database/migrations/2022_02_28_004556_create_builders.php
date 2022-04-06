@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('address2', 125)->nullable();
             $table->string('city', 125);
             $table->char('state', 2)->default('FL');
-            $table->string('zip', 10);
+            $table->string('postal_code', 10);
 
             $table->timestamps();
             $table->softDeletes();

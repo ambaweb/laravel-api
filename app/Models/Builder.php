@@ -18,7 +18,7 @@ class Builder extends Model
         'address2',
         'city',
         'state',
-        'zip'
+        'postal_code'
     ];
 
     public function divisions()

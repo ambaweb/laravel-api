@@ -11,13 +11,13 @@ class AuthenticationTest extends TestCase
 {
     use WithFaker;
 
-    public function test_required_field_for_registration()
+    public function test_post_required_field_for_registration()
     {
         $this->json('POST', 'api/register', [], ['Accept' => 'application/json'])
             ->assertStatus(422);
     }
 
-    public function test_repeated_password_for_registration()
+    public function test_post_repeated_password_for_registration()
     {
         $data = [
             "name" => $this->faker->name(),
@@ -35,7 +35,7 @@ class AuthenticationTest extends TestCase
             ]);
     }
 
-    public function test_successfull_registration()
+    public function test_post_successfull_registration()
     {
         $data = [
             "name" => $this->faker->name(),
@@ -52,17 +52,17 @@ class AuthenticationTest extends TestCase
             ]);
     }
 
-    public function test_required_field_for_login()
+    public function test_post_required_field_for_login()
     {
         $this->json('POST', 'api/login', [], ['Accept' => 'application/json'])
             ->assertStatus(422);
     }
 
-    public function test_successfull_login()
+    public function test_post_successfull_login()
     {
         $data = [
-            "email" =>  $this->faker->unique()->safeEmail(),
-            "password" => "test123",
+            "email" =>  env('API_TEST_USER'),
+            "password" => env('API_TEST_PASSWORD'),
         ];
 
         $this->json('POST', 'api/login', $data, ['Accept' => 'application/json'])

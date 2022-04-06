@@ -22,10 +22,10 @@ class BuilderResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'address' => $this->address,
-            'doorNo' => $this->address2,
+            'address2' => $this->address2,
             'city' => $this->city,
             'state' => $this->state,
-            'postalCode' => $this->zip,
+            'postal_code' => $this->postal_code,
             'divisions' => new DivisionCollection($this->whenLoaded('divisions'))
         ];
     }

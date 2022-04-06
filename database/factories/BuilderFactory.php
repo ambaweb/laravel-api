@@ -19,11 +19,12 @@ class BuilderFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
-            'phone' => $this->faker->phoneNumber(),
+            'phone' => $this->faker->numerify('##########'),
             'address' => $this->faker->streetAddress(),
+            'address2' => $this->faker->secondaryAddress(),
             'city' => $this->faker->citySuffix(),
             'state' => $this->faker->stateAbbr(),
-            'zip' => $this->faker->postcode(),
+            'postal_code' => $this->faker->numerify('#####'),
         ];
     }
 }

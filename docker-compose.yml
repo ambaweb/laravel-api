@@ -47,16 +47,6 @@ services:
     networks:
       - app-api-network
 
-#Adminer Service
-  adminer:
-    container_name: "adminer"
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-    networks:
-      - app-api-network
-
 #Docker Networks
 networks:
   app-api-network:

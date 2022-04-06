@@ -33,7 +33,7 @@ class StoreBuilderRequest extends FormRequest
                 'address' => 'sometimes|required',
                 'city' => 'sometimes|required',
                 'state' => 'sometimes|required|size:2',
-                'postalCode'  => 'sometimes|required|digits:5'
+                'postal_code'  => 'sometimes|required|digits:5'
             ];
         } else {
             return [
@@ -43,18 +43,8 @@ class StoreBuilderRequest extends FormRequest
                 'address' => 'required',
                 'city' => 'required',
                 'state' => 'required|size:2',
-                'postalCode'  => 'required|digits:5',
+                'postal_code'  => 'required|digits:5',
             ]; 
-        }
-    }
-
-    protected function prepareForValidation()
-    {
-        if ($this->postalCode) {
-            $this->merge([
-                'zip' => $this->postalCode,
-                'address2' => $this->doorNo
-            ]);
         }
     }
 }
