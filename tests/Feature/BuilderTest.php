@@ -88,6 +88,23 @@ class BuilderTest extends TestCase
             ]);
     }
 
+    public function test_throw_error_if_builder_has_been_created()
+    {
+        $payload = Builder::first()->toArray();
+
+        $response = $this->postJson($this->endpoint, $payload, $this->header);
+
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'email' => [
+                        'The email has already been taken.'  
+                    ]
+                ]
+            ]);
+    }
+
     public function test_return_authenticated_user_can_get_builders_list()
     {
         $response = $this->getJson($this->endpoint, $this->header);
@@ -154,7 +171,7 @@ class BuilderTest extends TestCase
             ]);
     }
 
-    public function test_not_found_error_when_builder_is_not_exists()
+    public function test_throw_error_if_builder_is_not_exists()
     {
         $response = $this->getJson("{$this->endpoint}/0", $this->header);
 

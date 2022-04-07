@@ -27,8 +27,8 @@ class StoreBuilderRequest extends FormRequest
 
         if ($method == 'PATCH') {
             return [
+                'email' => 'sometimes|required|email|unique:builders',
                 'name' => 'sometimes|required',
-                'email' => 'sometimes|required|email',
                 'phone' => 'sometimes|required|digits:10',
                 'address' => 'sometimes|required',
                 'city' => 'sometimes|required',
@@ -38,8 +38,8 @@ class StoreBuilderRequest extends FormRequest
             ];
         } else {
             return [
+                'email' => 'required|email|unique:builders',
                 'name' => 'required',
-                'email' => 'required|email',
                 'phone' => 'required|digits:10',
                 'address' => 'required',
                 'city' => 'required',
