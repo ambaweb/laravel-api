@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Requests\UserRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -28,24 +29,24 @@ class AuthController extends Controller
             return response([
                 'access_token' => $token,
                 'token_type' => 'Bearer'
-            ], 200);
+            ], Response::HTTP_OK);
         } else {
 
             return response([
                 'message' => 'Unauthenticated',
-            ], 500);
+            ], Response::HTTP_UNAUTHORIZED);
         }
     }
 
     public function register(UserRequest $request)
     {
-        $request['password']=Hash::make($request['password']);
+        $request['password'] = Hash::make($request['password']);
         $user = User::create($request->all());
         $token = $user->createToken('authToken')->plainTextToken;
 
         return response([
             'access_token' => $token,
             'token_type' => 'Bearer'
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 }

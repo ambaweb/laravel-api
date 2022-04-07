@@ -11,21 +11,35 @@ class AuthenticationTest extends TestCase
 {
     use WithFaker;
 
-    public function test_post_required_field_for_registration()
+    private $header;
+
+    public function setUp(): void
     {
-        $this->json('POST', 'api/register', [], ['Accept' => 'application/json'])
-            ->assertStatus(422);
+        parent::setUp();
+
+        $this->header = ['Accept' => 'application/json'];
     }
 
-    public function test_post_repeated_password_for_registration()
+    public function test_validation_error_when_send_empty_payload_for_registration()
     {
-        $data = [
-            "name" => $this->faker->name(),
-            "email" =>  $this->faker->unique()->safeEmail(),
-            "password" => "test123"
+        $response = $this->postJson('api/register', [], $this->header);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name', 'email', 'password']);
+    }
+
+    public function test_validation_error_when_confirm_password_not_matched_for_registration()
+    {
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' =>  $this->faker->unique()->safeEmail(),
+            'password' => env('API_TEST_USER_PASSWORD'),
         ];
 
-        $this->json('POST', 'api/register', $data, ['Accept' => 'application/json'])
+        $response = $this->postJson('api/register', $payload, $this->header);
+
+        $response
             ->assertStatus(422)
             ->assertJson([
                 "message" => "The password confirmation does not match.",
@@ -35,16 +49,39 @@ class AuthenticationTest extends TestCase
             ]);
     }
 
-    public function test_post_successfull_registration()
+    public function test_validation_error_when_email_already_taken_for_registration()
     {
-        $data = [
-            "name" => $this->faker->name(),
-            "email" =>  $this->faker->unique()->safeEmail(),
-            "password" => "test123",
-            "password_confirmation" => "test123"
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' =>  env('API_TEST_USER_NAME'),
+            'password' => env('API_TEST_USER_PASSWORD'),
+            'password_confirmation' => env('API_TEST_USER_PASSWORD'),
         ];
 
-        $this->json('POST', 'api/register', $data, ['Accept' => 'application/json'])
+        $response = $this->postJson('api/register', $payload, $this->header);
+
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                "message" => "The email has already been taken.",
+                "errors" => [
+                    "email" => ["The email has already been taken."]
+                ]
+            ]);
+    }
+
+    public function test_user_successfull_registration()
+    {
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' =>  $this->faker->unique()->safeEmail(),
+            'password' => 'test123',
+            'password_confirmation' => 'test123'
+        ];
+
+        $response = $this->postJson('api/register', $payload, $this->header);
+
+        $response
             ->assertStatus(201)
             ->assertJsonStructure([
                 'access_token',
@@ -52,20 +89,41 @@ class AuthenticationTest extends TestCase
             ]);
     }
 
-    public function test_post_required_field_for_login()
+    public function test_validation_error_when_both_fields_empty_for_login()
     {
-        $this->json('POST', 'api/login', [], ['Accept' => 'application/json'])
-            ->assertStatus(422);
+        $payload = [];
+
+        $response = $this->postJson('api/login', $payload, $this->header);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['email', 'password']);
     }
 
-    public function test_post_successfull_login()
+    public function test_validation_error_on_email_when_credential_donot_match()
     {
-        $data = [
-            "email" =>  env('API_TEST_USER'),
-            "password" => env('API_TEST_PASSWORD'),
+        $payload = [
+            'email' =>  $this->faker->unique()->safeEmail(),
+            'password' => 'test123456'
         ];
 
-        $this->json('POST', 'api/login', $data, ['Accept' => 'application/json'])
+        $response = $this->postJson('api/login', $payload, $this->header);
+
+        $response
+            ->assertStatus(401)
+            ->assertJson(['message' => 'Unauthenticated']);
+    }
+
+    public function test_return_user_token_after_successful_login()
+    {
+        $payload = [
+            'email' =>  env('API_TEST_USER_NAME'),
+            'password' => env('API_TEST_USER_PASSWORD'),
+        ];
+
+        $response = $this->postJson('api/login', $payload, $this->header);
+
+        $response
             ->assertStatus(200)
             ->assertJsonStructure([
                 'access_token',
