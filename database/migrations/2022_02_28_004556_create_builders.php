@@ -23,9 +23,12 @@ return new class extends Migration
             $table->string('city', 125);
             $table->char('state', 2)->default('FL');
             $table->string('postal_code', 10);
-
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
             $table->softDeletes();
+
+            // add index
+            $table->index(['is_active']);
         });
     }
 

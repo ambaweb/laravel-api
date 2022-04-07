@@ -11,18 +11,22 @@ class AuthenticationTest extends TestCase
 {
     use WithFaker;
 
+    private $registerEndpoint;
+    private $loginEndpoint;
     private $header;
 
     public function setUp(): void
     {
         parent::setUp();
 
+        $this->registerEndpoint = 'api/register';
+        $this->loginEndpoint = 'api/login';
         $this->header = ['Accept' => 'application/json'];
     }
 
     public function test_validation_error_when_send_empty_payload_for_registration()
     {
-        $response = $this->postJson('api/register', [], $this->header);
+        $response = $this->postJson($this->registerEndpoint, [], $this->header);
 
         $response
             ->assertStatus(422)
@@ -37,7 +41,7 @@ class AuthenticationTest extends TestCase
             'password' => env('API_TEST_USER_PASSWORD'),
         ];
 
-        $response = $this->postJson('api/register', $payload, $this->header);
+        $response = $this->postJson($this->registerEndpoint, $payload, $this->header);
 
         $response
             ->assertStatus(422)
@@ -58,7 +62,7 @@ class AuthenticationTest extends TestCase
             'password_confirmation' => env('API_TEST_USER_PASSWORD'),
         ];
 
-        $response = $this->postJson('api/register', $payload, $this->header);
+        $response = $this->postJson($this->registerEndpoint, $payload, $this->header);
 
         $response
             ->assertStatus(422)
@@ -70,7 +74,7 @@ class AuthenticationTest extends TestCase
             ]);
     }
 
-    public function test_user_successfull_registration()
+    public function test_successfull_user_registration()
     {
         $payload = [
             'name' => $this->faker->name(),
@@ -79,7 +83,7 @@ class AuthenticationTest extends TestCase
             'password_confirmation' => 'test123'
         ];
 
-        $response = $this->postJson('api/register', $payload, $this->header);
+        $response = $this->postJson($this->registerEndpoint, $payload, $this->header);
 
         $response
             ->assertStatus(201)
@@ -93,21 +97,21 @@ class AuthenticationTest extends TestCase
     {
         $payload = [];
 
-        $response = $this->postJson('api/login', $payload, $this->header);
+        $response = $this->postJson($this->loginEndpoint, $payload, $this->header);
 
         $response
             ->assertStatus(422)
             ->assertJsonValidationErrors(['email', 'password']);
     }
 
-    public function test_validation_error_on_email_when_credential_donot_match()
+    public function test_validation_error_when_credential_do_not_match()
     {
         $payload = [
             'email' =>  $this->faker->unique()->safeEmail(),
             'password' => 'test123456'
         ];
 
-        $response = $this->postJson('api/login', $payload, $this->header);
+        $response = $this->postJson($this->loginEndpoint, $payload, $this->header);
 
         $response
             ->assertStatus(401)
@@ -121,7 +125,7 @@ class AuthenticationTest extends TestCase
             'password' => env('API_TEST_USER_PASSWORD'),
         ];
 
-        $response = $this->postJson('api/login', $payload, $this->header);
+        $response = $this->postJson($this->loginEndpoint, $payload, $this->header);
 
         $response
             ->assertStatus(200)

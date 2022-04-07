@@ -23,6 +23,7 @@ class DivisionFactory extends Factory
             'state' => $this->faker->stateAbbr(),
             'latitude' => $this->faker->latitude(),
             'longitude' => $this->faker->longitude(),
+            'is_active' => 1
         ];
     }
 }

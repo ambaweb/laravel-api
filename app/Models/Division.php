@@ -11,14 +11,20 @@ class Division extends Model
     use HasFactory;
 
     protected $fillable = [
+        'builder_id',
         'name',
         'state',
         'latitude',
-        'longitude'
+        'longitude',
+        'is_active'
     ];
 
     public function builder()
     {
         return $this->belongsTo(Builder::class);
+    }
+
+    public function setStateAttribute($value){
+        $this->attributes['state'] = strtoupper($value);
     }
 }

@@ -16,7 +16,6 @@ class BuilderTest extends TestCase
     private $endpoint;
     private $header;
     private $responseDataStructure;
-    private $user;
 
     public function setUp(): void
     {
@@ -37,7 +36,8 @@ class BuilderTest extends TestCase
             'address2',
             'city',
             'state',
-            'postal_code'
+            'postal_code',
+            'is_active'
         ];
     }
 
@@ -47,7 +47,15 @@ class BuilderTest extends TestCase
 
         $response
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['name', 'email', 'phone', 'address', 'city', 'postal_code']);
+            ->assertJsonValidationErrors([
+                'name', 
+                'email', 
+                'phone', 
+                'address', 
+                'city', 
+                'postal_code',
+                'is_active'
+            ]);
     }
 
     public function test_authenticated_user_can_post_builder()
@@ -75,9 +83,6 @@ class BuilderTest extends TestCase
 
         $response
             ->assertStatus(201)
-            ->assertJsonStructure([
-                'data' => $this->responseDataStructure
-            ])
             ->assertJson([
                 'data' => $payload
             ]);
@@ -122,14 +127,8 @@ class BuilderTest extends TestCase
                     'city',
                     'state',
                     'postal_code',
-                    'divisions' =>
-                    [[
-                        'id',
-                        'name',
-                        'state',
-                        'latitude',
-                        'longitude'
-                    ]]
+                    'is_active',
+                    'divisions'
                 ]],
                 'meta' => [
                     'current_page',
@@ -153,6 +152,15 @@ class BuilderTest extends TestCase
             ->assertJsonStructure([
                 'data' => $this->responseDataStructure,
             ]);
+    }
+
+    public function test_not_found_error_when_builder_is_not_exists()
+    {
+        $response = $this->getJson("{$this->endpoint}/0", $this->header);
+
+        $response
+            ->assertStatus(404)
+            ->assertJsonStructure(['message']);
     }
 
     public function test_non_authenticated_user_cannot_get_builder_details()

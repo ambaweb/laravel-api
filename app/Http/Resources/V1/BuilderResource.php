@@ -26,6 +26,7 @@ class BuilderResource extends JsonResource
             'city' => $this->city,
             'state' => $this->state,
             'postal_code' => $this->postal_code,
+            'is_active' => $this->is_active,
             'divisions' => new DivisionCollection($this->whenLoaded('divisions'))
         ];
     }

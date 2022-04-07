@@ -20,7 +20,7 @@ return new class extends Migration
             $table->char('state', 2);
             $table->float('latitude', 125);
             $table->float('longitude', 125);
-
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
             $table->softDeletes();
 

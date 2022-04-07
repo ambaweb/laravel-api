@@ -33,7 +33,8 @@ class StoreBuilderRequest extends FormRequest
                 'address' => 'sometimes|required',
                 'city' => 'sometimes|required',
                 'state' => 'sometimes|required|size:2',
-                'postal_code'  => 'sometimes|required|digits:5'
+                'postal_code'  => 'sometimes|required|digits:5',
+                'is_active'  => 'sometimes|required|boolean'
             ];
         } else {
             return [
@@ -44,6 +45,7 @@ class StoreBuilderRequest extends FormRequest
                 'city' => 'required',
                 'state' => 'required|size:2',
                 'postal_code'  => 'required|digits:5',
+                'is_active'  => 'required|required|boolean'
             ]; 
         }
     }

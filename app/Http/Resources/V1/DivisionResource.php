@@ -21,6 +21,7 @@ class DivisionResource extends JsonResource
             'state' => $this->state,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
+            'is_active' => $this->is_active
         ];
     }
 }

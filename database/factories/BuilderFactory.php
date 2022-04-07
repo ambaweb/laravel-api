@@ -25,6 +25,7 @@ class BuilderFactory extends Factory
             'city' => $this->faker->citySuffix(),
             'state' => $this->faker->stateAbbr(),
             'postal_code' => $this->faker->numerify('#####'),
+            'is_active' => 1
         ];
     }
 }

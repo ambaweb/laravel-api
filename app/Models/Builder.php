@@ -18,11 +18,16 @@ class Builder extends Model
         'address2',
         'city',
         'state',
-        'postal_code'
+        'postal_code',
+        'is_active'
     ];
 
     public function divisions()
     {
         return $this->hasMany(Division::class);
+    }
+
+    public function setStateAttribute($value){
+        $this->attributes['state'] = strtoupper($value);
     }
 }

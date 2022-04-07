@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Division;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\BuilderResource;
 use App\Http\Resources\V1\DivisionCollection;
+use App\Http\Requests\V1\StoreDivisionRequest;
+use App\Http\Resources\V1\DivisionResource;
 
 class DivisionController extends Controller
 {
@@ -17,7 +20,9 @@ class DivisionController extends Controller
      */
     public function index()
     {
-        return new DivisionCollection(Division::paginate());
+        return (new DivisionCollection(Division::paginate()))
+        ->response()
+        ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -36,9 +41,11 @@ class DivisionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreDivisionRequest $request)
     {
-        return new BuilderResource(Division::create($request->all()));
+        return (new BuilderResource(Division::create($request->all())))
+        ->response()
+        ->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
@@ -49,7 +56,10 @@ class DivisionController extends Controller
      */
     public function show(Division $division)
     {
-        return new BuilderResource($division);
+        
+        return (new BuilderResource($division))
+        ->response()
+        ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -70,9 +80,12 @@ class DivisionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreDivisionRequest $request, Division $division)
     {
-        //
+        $division->update($request->all());
+        return (new DivisionResource($division))
+        ->response()
+        ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
