@@ -1,65 +1,39 @@
-name: Laravel API
+name: Laravel CI
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, staging ]
 
 jobs:
-  phpunit:
+  laravel-tests:
+
     runs-on: ubuntu-latest
-    
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_USER: username
-          MYSQL_PASSWORD: password
-          MYSQL_DATABASE: test
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 1
-        
-    - name: Setup PHP
-    - uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.0'
-        tools: phpunit, prestissimo
-        extensions: gd, json, mbstring, mysql, dom, fileinfo, xml, xsl, zip, curl, bcmath, intl
-    
-    - name: Get composer cache directory
-      id: composer-cache
-      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-    - name: Cache composer dependencies
-    - uses: actions/cache@v1
-      with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: ${{ runner.os }}-composer-
-
-    - name: Install Composer dependencies
-      run: composer install --no-scripts --no-progress --no-suggest --prefer-dist --optimize-autoloader
-
-    - name: Copy Laravel CI environment
-      run: cp .env.ci .env
-
-    - name: Generate Key
+    - uses: actions/checkout@v2
+    - name: Copy .env.example to .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Install composer dependencies
+      run: composer install
+    - name: Set required directory permissions
+      run: chmod -R 777 storage bootstrap/cache
+    - name: Generate encryption key
       run: php artisan key:generate
-
-    - name: Run Migration
-      run: php artisan migrate
+    - name: Create temporary sqlite database
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+    - name: Run laravel database migrations
       env:
-        DB_PORT: ${{ job.services.mysql.ports['3306'] }}
-    
-    - name: Run Testsuite
-      run: vendor/bin/phpunit
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+      run: php artisan migrate --force
+    - name: Install NPM dependencies
+      run: npm install
+    - name: Minify CSS and JS files
+      run: npm run prod
+    - name: Run unit tests via PHPUnit
       env:
-        DB_PORT: ${{ job.services.mysql.ports['3306'] }}
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+      run: ./vendor/bin/phpunit
