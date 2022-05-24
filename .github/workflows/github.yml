@@ -25,14 +25,17 @@ jobs:
       run: |
         sudo /etc/init.d/mysql start
         mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USERNAME }} -p${{ env.DB_PASSWORD }}
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-    - name: Generate key
-      run: php artisan key:generate
+    - name: Prepare Laravel Application
+      run: |
+        php -r "file_exists('.env') || copy('.env.example', '.env');"
+        php artisan key:generate
+        
+    - name: Migrate and seed
+      run: php artisan migrate --seed
 
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
